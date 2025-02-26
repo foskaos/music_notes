@@ -1,5 +1,6 @@
 # this will be able to take a root note and give me the nth step from it (+/-)
 import random
+
 NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 NOTE_NAMES_FLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"]
 
@@ -120,13 +121,7 @@ def get_scale(root: str, scale: str) -> list[str]:
     return scale
 
 
-
-
-
-
-
 class Chord:
-
     def __init__(self, root: str, chord_type: str):
         self.root = root
         self.chord_type = chord_type
@@ -134,6 +129,26 @@ class Chord:
 
     def __repr__(self):
         return f"{self.root} {self.chord_type}: {self.notes}"
+
+    @staticmethod
+    def get_note(note_name: str, offset: int) -> str:
+        """
+        Gets a note with an optional offset in half steps
+        :param note_name:
+        :param offset:
+        :return:
+        """
+        note = notes_lookup.get(note_name, None)
+        if note is None:
+            raise KeyError(f"No note named {note_name}")
+
+        if offset:
+            note = note + offset
+
+        if "b" in note_name:  # If the root was a flat note, use the flat notation
+            return NOTE_NAMES_FLAT[note % 12]
+        else:
+            return NOTE_NAMES[note % 12]
 
     @staticmethod
     def get_note_pattern(root, pattern):
@@ -169,7 +184,6 @@ class Chord:
                 return chord[inversion:] + chord[:inversion]
 
 
-
 def draw_notes(n: int = 4):
     print(f"Drawing {n} notes")
 
@@ -177,16 +191,16 @@ def draw_notes(n: int = 4):
     # picks 4 notes (not allowing already chosen notes)
     # picks a chord for each note (can be the same)
     while len(indicies) < n:
-        note_index = random.randint(0,len(NOTE_NAMES)-1)
+        note_index = random.randint(0, len(NOTE_NAMES) - 1)
         if note_index in indicies:
             continue
-        chord_index = random.randint(0, len(CHORD_SHAPES.keys())-1)
+        chord_index = random.randint(0, len(CHORD_SHAPES.keys()) - 1)
         chord_name = [*CHORD_SHAPES.keys()][chord_index]
         chord = Chord(NOTE_NAMES[note_index], chord_name)
         note = NOTE_NAMES[note_index]
         indicies[note] = chord
 
-    return [chord for note,chord in indicies.items()]
+    return [chord for note, chord in indicies.items()]
 
 
 print(get_note("C", 0))
