@@ -1,0 +1,6 @@
+[project]
+name = "music-notes"
+version = "0.1.0"
+description = "tool to play with musical note patters"
+requires-python = ">=3.13"
+dependencies = []
