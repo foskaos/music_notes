@@ -1,5 +1,5 @@
 # this will be able to take a root note and give me the nth step from it (+/-)
-
+import random
 NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 NOTE_NAMES_FLAT = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"]
 
@@ -120,6 +120,75 @@ def get_scale(root: str, scale: str) -> list[str]:
     return scale
 
 
+
+
+
+
+
+class Chord:
+
+    def __init__(self, root: str, chord_type: str):
+        self.root = root
+        self.chord_type = chord_type
+        self.notes = self.get_chord()
+
+    def __repr__(self):
+        return f"{self.root} {self.chord_type}: {self.notes}"
+
+    @staticmethod
+    def get_note_pattern(root, pattern):
+        notes = []
+        for note in pattern:
+            notes.append(get_note(root, note))
+        return notes
+
+    def get_chord(self) -> list[str]:
+        """
+        Builds a chord from a root note and a step pattern
+        :param root: The root note
+        :param chord_type:
+        :return:
+        """
+        chord_pattern = CHORD_SHAPES.get(self.chord_type.lower(), None)
+
+        if chord_pattern is None:
+            raise KeyError("Unknown chord type")
+
+        chord = get_note_pattern(self.root, chord_pattern)
+
+        return chord
+
+    def invert_chord(chord: list[str], inversion: int) -> list[str]:
+        if inversion not in [0, 1, 2]:
+            raise ValueError("Invalid inversion")
+
+        match inversion:
+            case 0:
+                return chord
+            case _:
+                return chord[inversion:] + chord[:inversion]
+
+
+
+def draw_notes(n: int = 4):
+    print(f"Drawing {n} notes")
+
+    indicies = {}
+    # picks 4 notes (not allowing already chosen notes)
+    # picks a chord for each note (can be the same)
+    while len(indicies) < n:
+        note_index = random.randint(0,len(NOTE_NAMES)-1)
+        if note_index in indicies:
+            continue
+        chord_index = random.randint(0, len(CHORD_SHAPES.keys())-1)
+        chord_name = [*CHORD_SHAPES.keys()][chord_index]
+        chord = Chord(NOTE_NAMES[note_index], chord_name)
+        note = NOTE_NAMES[note_index]
+        indicies[note] = chord
+
+    return [chord for note,chord in indicies.items()]
+
+
 print(get_note("C", 0))
 print(get_note("C", 3))
 print(get_note("G", 7))
@@ -129,3 +198,5 @@ print(invert_chord(get_chord("C", "major"), 0))
 print(invert_chord(get_chord("C", "major"), 1))
 print(invert_chord(get_chord("C", "major"), 2))
 print(get_scale("C", "ionian"))
+
+print(draw_notes(4))
